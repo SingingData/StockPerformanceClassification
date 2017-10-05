@@ -84,7 +84,7 @@ import regex
 ##########################################
 
 from azure.storage.blob import BlockBlobService
-block_blob_service = BlockBlobService(account_name='nextagenda2017', account_key='aru+74LarKasMjB3BfsUM/rvPs/uGy9h7IicELf70DNWT+LoeRwbYqZIq32iLf7sSVjSSuqvKDtqr094+vUL8g==')
+block_blob_service = BlockBlobService(account_name='youraccount', account_key='yourkeystring')
 
 block_blob_service.get_blob_to_path('pklfiles', 'stockdata3bins.pkl','Data.pkl')
 print('blobservice loaded')
