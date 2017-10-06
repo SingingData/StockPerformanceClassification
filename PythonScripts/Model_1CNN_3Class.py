@@ -61,6 +61,7 @@ import gensim
 from gensim.models import Phrases, phrases
 from gensim.models.phrases import Phraser
 from gensim.models import Word2Vec as wv
+
 import nltk
 from nltk.corpus import stopwords
 from gensim import corpora, models, similarities
