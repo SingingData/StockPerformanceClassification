@@ -22,5 +22,8 @@ Installs and Upgrades Required (Order is Important)
 - pip install h5py
 - pip install graphviz
 - pip install pydot
+- pip install pyparsing==1.5.7
+- pip install pydot==1.0.28
 - Install graphviz binaries linked in this issue https://stackoverflow.com/questions/36886711/keras-runtimeerror-failed-to-import-pydot-after-installing-graphviz-and-pyd
+
 
