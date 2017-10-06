@@ -1,4 +1,4 @@
-
+ 
 # StockPerformanceClassification
 Keras 1D CNN on Azure ML Workbench to classify 4 week stock performance based on text in public earnings statements
 
@@ -23,6 +23,6 @@ Installs and Upgrades Required (Order is Important)
 - pip install graphviz
 - Install graphviz binaries linked in this issue https://stackoverflow.com/questions/36886711/keras-runtimeerror-failed-to-import-pydot-after-installing-graphviz-and-pyd
 - pip install pydotplus
-
+- In vis_utils.py comment out def _check_pydot(): lines 19 through 28
 
 
