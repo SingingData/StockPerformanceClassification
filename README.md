@@ -3,7 +3,6 @@
 Keras 1D CNN on Azure ML Workbench to classify 4 week stock performance based on text in public earnings statements
 
 Installs and Upgrades Required (Order is Important)
-- installs and upgrades
 - conda install mkl-service
 - conda install m2w64-toolchain
 - conda install -c anaconda libpython=2.0
