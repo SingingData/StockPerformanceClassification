@@ -14,7 +14,7 @@ Model accuracy and loss over 15 training epochs is depicted in the illustration 
  
 ## Model Architecture
 This graphic depicts the model architecture.
-![alt text](https://github.com/SingingData/StockPerformanceClassification/blob/master/modelarchitecture.png)
+![alt text](https://github.com/SingingData/StockPerformanceClassification/blob/master/images/modelarchitecture.png)
 
 ## Azure ML Workbench
 We built the solution on the Azure ML Workbench python environment.  We found the following installs and upgrades were required.
