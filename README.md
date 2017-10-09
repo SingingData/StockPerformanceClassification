@@ -1,5 +1,6 @@
-# Overview of Project
+# Stock Performance Classification with a 1D CNN, Keras and Azure ML Workbench
 
+## Overview
 Based on text in public earnings releases, Next Agenda would like to predict future stock performance.  For the purposes of an initial exploration, we bucketed the future stock performance as percentage change in stock price in 4 weeks from the price on the publication date.  To simplify our exploration further, we split the performance into three equal bins – 0,1,2 – representing low performance, middle performance and high performance.  Each bin contains one third of the population.    And as a final step, to narrow the subject matter, we modeled just on data from one industry, the biotechnology industry.
 
 We used a 1D CNN in Keras, using word embeddings from the GloVe vector model published by Stanford.  (all links in code).  For purposes of initial exploration, we used the smallest word vector model, with 400,000 words.  We applied 39% dropout rate, and used the RMSProp optimizer with the Xavier initializer.  We took the documented Keras approach for working with custom word embeddings.  
@@ -8,7 +9,11 @@ Our output suggests there is some signal available to get above chance classific
 
 As next steps, the partner will experiment with LSTM and to incorporate sequential information in the release dates.  They will aslo replicate this model for different industries and across all industries together to determine if the signal persists.   
 
-# Azure ML Workbench
+## Model Architecture
+This graphic depicts the model architecture.
+![alt text](https://github.com/SingingData/StockPerformanceClassification/blob/master/modelarchitecture.png)
+
+## Azure ML Workbench
 We built the solution on the Azure ML Workbench python environment.  We found the following installs and upgrades were required.
 
 Installs and Upgrades Required (Order is Important)
