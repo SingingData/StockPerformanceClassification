@@ -9,6 +9,9 @@ Our output suggests there is some signal available to get above chance classific
 
 As next steps, the partner will experiment with LSTM and to incorporate sequential information in the release dates.  They will aslo replicate this model for different industries and across all industries together to determine if the signal persists.   
 
+Model accuracy and loss over 15 training epochs is depicted in the illustration below.  Validation accuracy reaches a max of .49, well above the chance expected result of 33.3% for predicting classification of three evenly split bins.
+![alt text](https://github.com/SingingData/StockPerformanceClassification/blob/master/images/Model_Training_accuracyandloss.png)
+ 
 ## Model Architecture
 This graphic depicts the model architecture.
 ![alt text](https://github.com/SingingData/StockPerformanceClassification/blob/master/modelarchitecture.png)
