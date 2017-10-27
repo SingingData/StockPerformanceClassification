@@ -123,21 +123,16 @@ def clean_text(row):
     # Convert HTML punctuation chaaracters
     cleantext = cleantext.replace('.', '')
     cleantext = cleantext.replace(',', '')
-    cleantext = cleantext.replace('!', '')
-    cleantext = cleantext.replace('$;', '')
-    cleantext = cleantext.replace(';', '')
-    cleantext = cleantext.replace(')', '')
-    cleantext = cleantext.replace('(', '') 
-    cleantext = cleantext.replace('', '')   
-    cleantext = cleantext.replace('>', '')  
-    cleantext = cleantext.replace('<', '')  
+
+    #remove non alpha characters and specific noise
+    cleantext = re.sub(r'\d+', '',cleantext)
+    cleantext = re.sub(r'^b','',cleantext)
+    cleantext = re.sub(r'[^\w]',' ',cleantext)
 
     #remove specific noise
     cleantext = cleantext.translate(str.maketrans({'‘':' ','’':' '}))
-    cleantext = cleantext.translate(str.maketrans({',':'',',':''}))
-    cleantext = cleantext.translate(str.maketrans({'[':'',']':''}))
+    cleantext = cleantext.translate(str.maketrans({',':' ',',':' '}))
     cleantext = cleantext.translate(str.maketrans({'"':'','%':''}))
-    cleantext = cleantext.translate(str.maketrans({'^':'','*':''}))
 
     #remove punctuation
     punctpattern = re.compile('[%s]' % re.escape(string.punctuation))
@@ -150,6 +145,7 @@ def clean_text(row):
     cleantext = re.sub('\s+', ' ', cleantext).strip()
 
     return cleantext
+
 
 #apply regex fixes to the input text column
 thedata['CleanText'] = thedata.apply(clean_text, axis=1)
@@ -182,7 +178,7 @@ MAX_SEQUENCE_LENGTH = 25000
 MAX_NB_WORDS = 350000
 EMBEDDING_DIM = 300
 VALIDATION_SPLIT = 0.22
-LEARNING_RATE = .000008
+LEARNING_RATE = .000006
 BATCH_SIZE = 75
 DROPOUT_RATE = 0.33
 
@@ -329,6 +325,7 @@ x = MaxPooling1D(35)(x)  # global max pooling
 x = Flatten()(x)
 x = Dense(128, kernel_initializer='glorot_uniform')(x)
 x = LeakyReLU(alpha=.3)(x)
+#x = BatchNormalization()
 x = Dropout(DROPOUT_RATE)(x)
 preds = Dense(len(labels_index), activation='softmax', kernel_initializer='glorot_uniform')(x)
 
@@ -347,11 +344,11 @@ model.compile(loss='categorical_crossentropy',
 from keras.callbacks import History 
 history = History()
 
-early_stopping = EarlyStopping(monitor='val_loss', patience=3)
+early_stopping = EarlyStopping(monitor='val_loss', patience=4)
 
 history = model.fit(X_train, y_train,
           batch_size=BATCH_SIZE,
-          epochs=16,
+          epochs=20,
           validation_data=(X_val, y_val), callbacks=[early_stopping, history])
 
 
