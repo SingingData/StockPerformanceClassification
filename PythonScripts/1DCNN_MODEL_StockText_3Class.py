@@ -1,4 +1,4 @@
-##############################################################################################################################################
+#############################################################################################################################################
 #
 # Stock future performance classification based on text
 #
@@ -182,9 +182,9 @@ MAX_SEQUENCE_LENGTH = 25000
 MAX_NB_WORDS = 350000
 EMBEDDING_DIM = 300
 VALIDATION_SPLIT = 0.22
-LEARNING_RATE = .0002
+LEARNING_RATE = .000008
 BATCH_SIZE = 75
-DROPOUT_RATE = 0.20
+DROPOUT_RATE = 0.33
 
 os.chdir('C:\\')
 np.random.seed(2032)
@@ -328,7 +328,7 @@ x = Conv1D(128, 5, activation='relu')(x)
 x = MaxPooling1D(35)(x)  # global max pooling
 x = Flatten()(x)
 x = Dense(128, kernel_initializer='glorot_uniform')(x)
-x = PReLU(weights=None, alpha_initializer="zero")(x)
+x = LeakyReLU(alpha=.3)(x)
 x = Dropout(DROPOUT_RATE)(x)
 preds = Dense(len(labels_index), activation='softmax', kernel_initializer='glorot_uniform')(x)
 
@@ -337,22 +337,21 @@ model = Model(sequence_input, preds)
 ################################
 #Trying various optimizers
 ################################ 
-#adadelta = optimizers.Adadelta(lr=1.0, rho=0.95, epsilon=1e-08, decay=0.0) #keep default values
-adam = optimizers.Adam(lr=LEARNING_RATE, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+# 
+adam = optimizers.Adam(lr=LEARNING_RATE, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0, clipvalue=0.5)
 #nadam = optimizers.Nadam(lr=0.002, beta_1=0.9, beta_2=0.999, epsilon=1e-08, schedule_decay=0.004) #keep default values
 #rmsprop = optimizers.RMSprop(lr=LEARNING_RATE, rho=0.9, epsilon=1e-08, decay=0.00)
-
 model.compile(loss='categorical_crossentropy',
               optimizer= adam,
               metrics=['accuracy'])
 from keras.callbacks import History 
 history = History()
 
-early_stopping = EarlyStopping(monitor='val_loss', patience=2)
+early_stopping = EarlyStopping(monitor='val_loss', patience=3)
 
 history = model.fit(X_train, y_train,
           batch_size=BATCH_SIZE,
-          epochs=14,
+          epochs=16,
           validation_data=(X_val, y_val), callbacks=[early_stopping, history])
 
 
