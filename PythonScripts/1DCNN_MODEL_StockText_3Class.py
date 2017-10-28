@@ -59,7 +59,7 @@ from keras.layers import regularizers
 from keras.layers import constraints 
 from keras.layers.advanced_activations import PReLU
 from keras.layers.advanced_activations import LeakyReLU
-
+from keras.constraints import max_norm
 import keras.backend as K
 import os
 import tempfile  
@@ -178,9 +178,9 @@ MAX_SEQUENCE_LENGTH = 25000
 MAX_NB_WORDS = 350000
 EMBEDDING_DIM = 300
 VALIDATION_SPLIT = 0.22
-LEARNING_RATE = .000006
+LEARNING_RATE = .0001
 BATCH_SIZE = 75
-DROPOUT_RATE = 0.33
+DROPOUT_RATE = 0.3
 
 os.chdir('C:\\')
 np.random.seed(2032)
@@ -316,18 +316,21 @@ print('Train 1D Convnet with global maxpooling')
 sequence_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int32')
 
 embedded_sequences = embedding_layer(sequence_input)
-x = Conv1D(128, 5, activation='relu')(embedded_sequences)
+x = Conv1D(200, 5, activation='relu')(embedded_sequences)
+x = BatchNormalization(gamma_regularizer=None, gamma_initializer="one", weights=None, momentum=0.99, beta_regularizer=None, beta_initializer="zero", axis=-1, epsilon=0.001)(x)
 x = MaxPooling1D(5)(x)
 x = Conv1D(128, 5, activation='relu')(x)
+x = BatchNormalization(axis=-1)(x)
 x = MaxPooling1D(5)(x)
 x = Conv1D(128, 5, activation='relu')(x)
+x = BatchNormalization(axis=-1)(x)
 x = MaxPooling1D(35)(x)  # global max pooling
 x = Flatten()(x)
-x = Dense(128, kernel_initializer='glorot_uniform')(x)
+x = Dense(128, kernel_initializer='glorot_uniform', kernel_constraint=max_norm(2.))(x)
 x = LeakyReLU(alpha=.3)(x)
-#x = BatchNormalization()
+x = BatchNormalization(axis=-1)(x)
 x = Dropout(DROPOUT_RATE)(x)
-preds = Dense(len(labels_index), activation='softmax', kernel_initializer='glorot_uniform')(x)
+preds = Dense(len(labels_index), activation='softmax', kernel_initializer='glorot_uniform',kernel_constraint=max_norm(2.))(x)
 
 
 model = Model(sequence_input, preds)
@@ -344,7 +347,7 @@ model.compile(loss='categorical_crossentropy',
 from keras.callbacks import History 
 history = History()
 
-early_stopping = EarlyStopping(monitor='val_loss', patience=4)
+early_stopping = EarlyStopping(monitor='val_loss', patience=6)
 
 history = model.fit(X_train, y_train,
           batch_size=BATCH_SIZE,
