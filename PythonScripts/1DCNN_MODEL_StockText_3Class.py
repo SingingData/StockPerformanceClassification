@@ -122,17 +122,16 @@ def clean_text(row):
 
     # Convert HTML punctuation chaaracters
     cleantext = cleantext.replace('.', '')
-    cleantext = cleantext.replace(',', '')
 
     #remove non alpha characters and specific noise
-    cleantext = re.sub(r'\d+', '',cleantext)
+    #cleantext = re.sub(r'\d+', '',cleantext)
     cleantext = re.sub(r'^b','',cleantext)
     cleantext = re.sub(r'[^\w]',' ',cleantext)
 
     #remove specific noise
     cleantext = cleantext.translate(str.maketrans({'‘':' ','’':' '}))
     cleantext = cleantext.translate(str.maketrans({',':' ',',':' '}))
-    cleantext = cleantext.translate(str.maketrans({'"':'','%':''}))
+    cleantext = cleantext.translate(str.maketrans({'"':' ','%':' '}))
 
     #remove punctuation
     punctpattern = re.compile('[%s]' % re.escape(string.punctuation))
@@ -177,10 +176,10 @@ print(justlabels['Return3Bin_4Weeks'].unique())
 MAX_SEQUENCE_LENGTH = 25000
 MAX_NB_WORDS = 350000
 EMBEDDING_DIM = 300
-VALIDATION_SPLIT = 0.22
-LEARNING_RATE = .0001
+VALIDATION_SPLIT = 0.2
+LEARNING_RATE = .0006
 BATCH_SIZE = 75
-DROPOUT_RATE = 0.3
+DROPOUT_RATE = 0.5
 
 os.chdir('C:\\')
 np.random.seed(2032)
@@ -198,6 +197,7 @@ GLOVE_DIR = BASE_DIR + '/glove/'
 # note that the values here are ultimately indexes to the actual words
 
 justcleandocslist  = justcleandocs.values
+justcleandocslist[6]
 labels  = justlabels.values
 labels_index = {}
 #labels_index =  {0:0,1:1,2:2,3:3,4:4}
@@ -267,7 +267,7 @@ words2['words'].apply(str)
 
 embeddings_index = words2.set_index('words').T.to_dict('list')
 
-print(dict(list(embeddings_index.items())[0:2]))
+#print(dict(list(embeddings_index.items())[0:2]))
 print('Found {} word vectors.'.format(len(embeddings_index)))
 #usage of pandas function dataFrame.to_dict(outtype='dict') outtype : str {‘dict’, ‘list’, ‘series’}
 
@@ -312,25 +312,32 @@ embedding_layer = Embedding(len(word_index) + 1,
 #
 ##############################################
 print('Train 1D Convnet with global maxpooling')
+print('Shape of training data sample tensor: ', X_train.shape)
+print('Shape of training label tensor: ', y_train.shape)
 
 sequence_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int32')
 
 embedded_sequences = embedding_layer(sequence_input)
-x = Conv1D(200, 5, activation='relu')(embedded_sequences)
-x = BatchNormalization(gamma_regularizer=None, gamma_initializer="one", weights=None, momentum=0.99, beta_regularizer=None, beta_initializer="zero", axis=-1, epsilon=0.001)(x)
-x = MaxPooling1D(5)(x)
-x = Conv1D(128, 5, activation='relu')(x)
+x = Conv1D(200, 5, activation='relu', kernel_initializer='glorot_normal')(embedded_sequences)
 x = BatchNormalization(axis=-1)(x)
 x = MaxPooling1D(5)(x)
-x = Conv1D(128, 5, activation='relu')(x)
+
+x = Conv1D(128, 5, activation='relu', kernel_initializer='glorot_normal')(embedded_sequences)
+x = BatchNormalization(axis=-1)(x)
+x = MaxPooling1D(5)(x)
+
+x = Conv1D(128, 5, activation='relu', kernel_initializer='glorot_normal')(x)
 x = BatchNormalization(axis=-1)(x)
 x = MaxPooling1D(35)(x)  # global max pooling
+
 x = Flatten()(x)
-x = Dense(128, kernel_initializer='glorot_uniform', kernel_constraint=max_norm(2.))(x)
-x = LeakyReLU(alpha=.3)(x)
+x = Dense(128, kernel_initializer='glorot_normal', kernel_constraint=max_norm(2.))(x)
+x = LeakyReLU(alpha=.001)(x) # #PReLU(alpha_initializer='zeros')(x)
 x = BatchNormalization(axis=-1)(x)
+
 x = Dropout(DROPOUT_RATE)(x)
-preds = Dense(len(labels_index), activation='softmax', kernel_initializer='glorot_uniform',kernel_constraint=max_norm(2.))(x)
+
+preds = Dense(len(labels_index), activation='softmax', kernel_initializer='glorot_normal', kernel_constraint=max_norm(2.))(x)
 
 
 model = Model(sequence_input, preds)
@@ -338,20 +345,20 @@ model = Model(sequence_input, preds)
 #Trying various optimizers
 ################################ 
 # 
-adam = optimizers.Adam(lr=LEARNING_RATE, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0, clipvalue=0.5)
+adam = optimizers.Adam(lr=LEARNING_RATE, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0, clipvalue=0.5)#, clipnorm=1.)
 #nadam = optimizers.Nadam(lr=0.002, beta_1=0.9, beta_2=0.999, epsilon=1e-08, schedule_decay=0.004) #keep default values
-#rmsprop = optimizers.RMSprop(lr=LEARNING_RATE, rho=0.9, epsilon=1e-08, decay=0.00)
+rmsprop = optimizers.RMSprop(lr=LEARNING_RATE, rho=0.9, epsilon=1e-08, decay=0.00, clipvalue=0.5)
 model.compile(loss='categorical_crossentropy',
-              optimizer= adam,
+              optimizer= rmsprop,
               metrics=['accuracy'])
 from keras.callbacks import History 
 history = History()
 
-early_stopping = EarlyStopping(monitor='val_loss', patience=6)
+early_stopping = EarlyStopping(monitor='val_loss', patience=15)
 
 history = model.fit(X_train, y_train,
           batch_size=BATCH_SIZE,
-          epochs=20,
+          epochs=15,
           validation_data=(X_val, y_val), callbacks=[early_stopping, history])
 
 
