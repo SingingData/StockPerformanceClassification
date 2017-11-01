@@ -234,6 +234,29 @@ y_train = labels[:-nb_validation_samples]
 X_val = data[-nb_validation_samples:]
 y_val = labels[-nb_validation_samples:]
 
+#y_train = to_categorical(np.asarray(y_train))
+#y_val = to_categorical(np.asarray(y_val))
+
+print('length of y_val',len(y_val))
+print('shape of y_val',y_val.shape)
+print('length of X_val',len(X_val))
+print('shape of X_val',X_val.shape)
+
+os.chdir('C:\\glove\\nextagenda')
+
+#from itertools import islice
+#head = list(islice(y_val, 6))
+#print('head of yval',head)
+
+
+
+#####################################
+# Save Validation Set for Evaluation
+####################################
+np.savetxt('y_val.txt', y_val, delimiter=',')
+np.savetxt('X_val.txt', X_val,  fmt='%s', delimiter=',')
+print('test and training sets saved to disk for later evaluation')
+ 
 
 ########################################
 # Preparing the embedding layer
@@ -297,15 +320,16 @@ print('Shape of training label tensor: ', y_train.shape)
 sequence_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int32')
 
 embedded_sequences = embedding_layer(sequence_input)
-x = Conv1D(200, 5, activation='relu', kernel_initializer='glorot_normal')(embedded_sequences)
-x = BatchNormalization(axis=-1)(x)
-x = MaxPooling1D(5)(x)
 
 x = Conv1D(128, 5, activation='relu', kernel_initializer='glorot_normal')(embedded_sequences)
 x = BatchNormalization(axis=-1)(x)
 x = MaxPooling1D(5)(x)
 
-x = Conv1D(128, 5, activation='relu', kernel_initializer='glorot_normal')(embedded_sequences)
+x = Conv1D(128, 5, activation='relu', kernel_initializer='glorot_normal')(x)
+x = BatchNormalization(axis=-1)(x)
+x = MaxPooling1D(5)(x)
+
+x = Conv1D(128, 5, activation='relu', kernel_initializer='glorot_normal')(x)
 x = BatchNormalization(axis=-1)(x)
 x = MaxPooling1D(5)(x)
 
@@ -344,11 +368,10 @@ history = model.fit(X_train, y_train,
           validation_data=(X_val, y_val), callbacks=[early_stopping, history])
 
 
-
 ##############################
 # Save Model and Plots
 ##############################
-model.save('C:\\glove\\New3EvenClass_v1model.h5')
+model.save('C:\\glove\\StockText_3Level3EvenClass_v1model.h5')
  
 import matplotlib.pyplot as plt  
 plt.figure(1)  
