@@ -334,11 +334,11 @@ x = BatchNormalization(axis=-1)(x)
 x = MaxPooling1D(35)(x)  # global max pooling
 
 x = Flatten()(x)
-x = Dense(128, activation='elu', kernel_initializer='glorot_normal', kernel_constraint=max_norm(2.))(x)
+x = Dense(128, activation='elu', kernel_initializer='glorot_normal')(x)
 x = BatchNormalization(axis=-1)(x)
 x = Dropout(DROPOUT_RATE)(x)
 
-preds = Dense(len(labels_index), activation='softmax', kernel_initializer='glorot_normal', kernel_constraint=max_norm(2.))(x)
+preds = Dense(len(labels_index), activation='softmax', kernel_initializer='glorot_normal')(x)
 
 
 model = Model(sequence_input, preds)
