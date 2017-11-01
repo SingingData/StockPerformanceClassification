@@ -56,8 +56,10 @@ from keras.layers.normalization import BatchNormalization
 from keras.layers import initializers 
 from keras.layers import regularizers 
 from keras.layers import constraints 
+from keras.layers import Activation
 from keras.layers.advanced_activations import PReLU
 from keras.layers.advanced_activations import LeakyReLU
+from keras.layers.advanced_activations import ELU
 from keras.constraints import max_norm
 import keras.backend as K
 import os
@@ -234,9 +236,6 @@ y_train = labels[:-nb_validation_samples]
 X_val = data[-nb_validation_samples:]
 y_val = labels[-nb_validation_samples:]
 
-#y_train = to_categorical(np.asarray(y_train))
-#y_val = to_categorical(np.asarray(y_val))
-
 print('length of y_val',len(y_val))
 print('shape of y_val',y_val.shape)
 print('length of X_val',len(X_val))
@@ -319,28 +318,24 @@ print('Shape of training label tensor: ', y_train.shape)
 
 sequence_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int32')
 
+
 embedded_sequences = embedding_layer(sequence_input)
 
-x = Conv1D(128, 5, activation='relu', kernel_initializer='glorot_normal')(embedded_sequences)
+x = Conv1D(200, 5, activation='elu', kernel_initializer='glorot_normal')(embedded_sequences)
 x = BatchNormalization(axis=-1)(x)
 x = MaxPooling1D(5)(x)
 
-x = Conv1D(128, 5, activation='relu', kernel_initializer='glorot_normal')(x)
+x = Conv1D(128, 5, activation='elu', kernel_initializer='glorot_normal')(x)
 x = BatchNormalization(axis=-1)(x)
 x = MaxPooling1D(5)(x)
 
-x = Conv1D(128, 5, activation='relu', kernel_initializer='glorot_normal')(x)
-x = BatchNormalization(axis=-1)(x)
-x = MaxPooling1D(5)(x)
-
-x = Conv1D(128, 5, activation='relu', kernel_initializer='glorot_normal')(x)
+x = Conv1D(128, 5, activation='elu', kernel_initializer='glorot_normal')(x)
 x = BatchNormalization(axis=-1)(x)
 x = MaxPooling1D(35)(x)  # global max pooling
-x = Flatten()(x)
-x = Dense(128, kernel_initializer='glorot_normal', kernel_constraint=max_norm(2.))(x)
-x = PReLU(alpha_initializer='zeros')(x) #LeakyReLU(alpha=.001)(x)
-x = BatchNormalization(axis=-1)(x)
 
+x = Flatten()(x)
+x = Dense(128, activation='elu', kernel_initializer='glorot_normal', kernel_constraint=max_norm(2.))(x)
+x = BatchNormalization(axis=-1)(x)
 x = Dropout(DROPOUT_RATE)(x)
 
 preds = Dense(len(labels_index), activation='softmax', kernel_initializer='glorot_normal', kernel_constraint=max_norm(2.))(x)
