@@ -210,6 +210,7 @@ word_index = tokenizer.word_index #word_index = tokenizer.word_index
 print('Found {} unique tokens'.format(len(word_index)))
 print('sequences first', sequences[0])
 
+#Pad sequences so that they all have the same length in a batch of input data 
 data = pad_sequences(sequences, maxlen=MAX_SEQUENCE_LENGTH)
 sequences = None
 texts = None
@@ -283,12 +284,6 @@ embedding_layer = Embedding(len(word_index) + 1,
                             weights=[embedding_matrix],
                             input_length=MAX_SEQUENCE_LENGTH,
                             trainable=False)
-#An Embedding layer is fed sequences of integers, i.e. a 2D input of shape (samples, indices). 
-#These input sequences have been padded so that they all have the same length in a batch of input data 
-
-#The embedding layer maps the integer inputs to the vectors found at the 
-#corresponding index in the embedding matrix, 
-
 
 
 ##############################################
@@ -345,7 +340,7 @@ early_stopping = EarlyStopping(monitor='val_loss', patience=2)
 
 history = model.fit(X_train, y_train,
           batch_size=BATCH_SIZE,
-          epochs=15,
+          epochs=5,
           validation_data=(X_val, y_val), callbacks=[early_stopping, history])
 
 
@@ -353,7 +348,7 @@ history = model.fit(X_train, y_train,
 ##############################
 # Save Model and Plots
 ##############################
-model.save('C:\\glove\Nov1_7pm_New3EvenClass_v1model.h5')
+model.save('C:\\glove\\New3EvenClass_v1model.h5')
  
 import matplotlib.pyplot as plt  
 plt.figure(1)  
