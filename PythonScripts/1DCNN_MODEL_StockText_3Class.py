@@ -173,13 +173,13 @@ print(justlabels['Return3Bin_4Weeks'].unique())
 # Set Global Vars
 ####################################################
 
-MAX_SEQUENCE_LENGTH = 25000
-MAX_NB_WORDS = 350000
+MAX_SEQUENCE_LENGTH = 10000
+MAX_NB_WORDS = 400000
 EMBEDDING_DIM = 300
 VALIDATION_SPLIT = 0.2
-LEARNING_RATE = .0009
-BATCH_SIZE = 75
-DROPOUT_RATE = 0.50
+LEARNING_RATE = .0006
+BATCH_SIZE = 128
+DROPOUT_RATE = 0.10
 np.random.seed(2032)
 
 #change directory to write results
@@ -213,7 +213,7 @@ print('Found {} unique tokens'.format(len(word_index)))
 print('sequences first', sequences[0])
 
 #Pad sequences so that they all have the same length in a batch of input data 
-data = pad_sequences(sequences, maxlen=MAX_SEQUENCE_LENGTH)
+data = pad_sequences(sequences, maxlen=MAX_SEQUENCE_LENGTH, padding='pre', truncating='pre')
 sequences = None
 texts = None
 
@@ -252,8 +252,8 @@ os.chdir('C:\\glove\\nextagenda')
 #####################################
 # Save Validation Set for Evaluation
 ####################################
-np.savetxt('y_val.txt', y_val, delimiter=',')
-np.savetxt('X_val.txt', X_val,  fmt='%s', delimiter=',')
+np.savetxt('y_val_3bin.txt', y_val, delimiter=',')
+np.savetxt('X_val_3bin.txt', X_val,  fmt='%s', delimiter=',')
 print('test and training sets saved to disk for later evaluation')
  
 
@@ -321,24 +321,24 @@ sequence_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int32')
 
 embedded_sequences = embedding_layer(sequence_input)
 
-x = Conv1D(200, 5, activation='elu', kernel_initializer='glorot_normal')(embedded_sequences)
-x = BatchNormalization(axis=-1)(x)
+x = Conv1D(128, 5, activation='elu', kernel_initializer='lecun_uniform')(embedded_sequences)
+#x = BatchNormalization(axis=-1)(x)
 x = MaxPooling1D(5)(x)
 
-x = Conv1D(128, 5, activation='elu', kernel_initializer='glorot_normal')(x)
-x = BatchNormalization(axis=-1)(x)
+x = Conv1D(128, 5, activation='elu', kernel_initializer='lecun_uniform')(x)
+#x = BatchNormalization(axis=-1)(x)
 x = MaxPooling1D(5)(x)
 
-x = Conv1D(128, 5, activation='elu', kernel_initializer='glorot_normal')(x)
-x = BatchNormalization(axis=-1)(x)
+x = Conv1D(128, 5, activation='elu', kernel_initializer='lecun_uniform')(x)
+#x = BatchNormalization(axis=-1)(x)
 x = MaxPooling1D(35)(x)  # global max pooling
 
 x = Flatten()(x)
-x = Dense(128, activation='elu', kernel_initializer='glorot_normal')(x)
+x = Dense(100, activation='elu', kernel_initializer='lecun_uniform')(x) # best initializers: #VarianceScaling #lecun_uniform
 x = BatchNormalization(axis=-1)(x)
 x = Dropout(DROPOUT_RATE)(x)
 
-preds = Dense(len(labels_index), activation='softmax', kernel_initializer='glorot_normal')(x)
+preds = Dense(len(labels_index), activation='softmax')(x) #no initialization in output layer
 
 
 model = Model(sequence_input, preds)
@@ -346,27 +346,27 @@ model = Model(sequence_input, preds)
 #Compile model, set optimizers
 ################################ 
 
-#adam = optimizers.Adam(lr=LEARNING_RATE, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0, clipvalue=0.5)#, clipnorm=1.)
-#nadam = optimizers.Nadam(lr=0.002, beta_1=0.9, beta_2=0.999, epsilon=1e-08, schedule_decay=0.004) #keep default values
-rmsprop = optimizers.RMSprop(lr=LEARNING_RATE, rho=0.9, epsilon=1e-08, decay=0.00, clipvalue=0.5)
+adam = optimizers.Adam(lr=LEARNING_RATE, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0, clipvalue=0.5)#, clipnorm=1.)
+rmsprop = optimizers.RMSprop(lr=LEARNING_RATE, rho=0.9, epsilon=1e-08, decay=0.00)
+
 model.compile(loss='categorical_crossentropy',
-              optimizer= rmsprop,
+              optimizer= adam,
               metrics=['accuracy'])
 from keras.callbacks import History 
 history = History()
 
-early_stopping = EarlyStopping(monitor='val_loss', patience=2)
+early_stopping = EarlyStopping(monitor='val_loss', patience=3)
 
 history = model.fit(X_train, y_train,
           batch_size=BATCH_SIZE,
-          epochs=5,
+          epochs=6,
           validation_data=(X_val, y_val), callbacks=[early_stopping, history])
 
 
 ##############################
 # Save Model and Plots
 ##############################
-model.save('C:\\glove\\StockText_3Level3EvenClass_v1model.h5')
+model.save('C:\\glove\\StockText_3Level3EvenClass_v1model3.h5')
  
 import matplotlib.pyplot as plt  
 plt.figure(1)  
