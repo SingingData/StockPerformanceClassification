@@ -95,7 +95,7 @@ from keras.utils import plot_model
 
 os.chdir('C:\\users\\pattyry\\documents\\AzureML\\NextAgenda_CodeStory\\NextAgenda_CodeStory')
 
-with open('biotechcleaned.pkl', 'rb') as f:
+with open('biotechcleaned2bin.pkl', 'rb') as f:
     data = pickle.load(f, encoding='utf8')
     print("Data unpickled")
 data = pd.DataFrame(data)
@@ -106,7 +106,7 @@ np.random.seed(1337)  # for reproducibility
 #If necessary, convert categories
 #################################
 #thedata['ReturnQuantile'] = thedata['ReturnQuantile'].map({0:0,1:1,2:1,3:1,4:2})
-print('Review the unique labels',thedata['Return3Bin_4Weeks'].unique())
+print('Review the unique labels',thedata['Return2Bin_4Weeks'].unique())
 
 ##########################################
 # clean up the text in the data with regex
@@ -157,16 +157,16 @@ justcleandocs.to_csv('C:\\glove\cleaneddata2.tsv', sep='\t', encoding='utf-8')
 # Convert labels to categorical
 ################################
 
-justcleandocs=thedata.drop(['fulltext','Return3Bin_4Weeks'], axis=1)
+justcleandocs=thedata.drop(['fulltext','Return2Bin_4Weeks'], axis=1)
 justcleandocs = justcleandocs['CleanText']
 print('post regex justcleandocs',justcleandocs.head(10))
 
 justlabels=thedata.drop(['fulltext','CleanText'], axis=1)
-justlabels=pd.DataFrame(justlabels['Return3Bin_4Weeks'])
+justlabels=pd.DataFrame(justlabels['Return2Bin_4Weeks'])
 print('head of just labels',justlabels.head(5))
 print(justlabels.head())
 print(justlabels.tail())
-print(justlabels['Return3Bin_4Weeks'].unique())
+print(justlabels['Return2Bin_4Weeks'].unique())
 
 
 ####################################################
@@ -201,7 +201,8 @@ justcleandocslist[6]
 labels  = justlabels.values
 labels_index = {}
 #labels_index =  {0:0,1:1,2:2,3:3,4:4}
-labels_index =  {0:0,1:1,2:2}
+#labels_index =  {0:0,1:1,2:2}
+labels_index =  {0:0,1:1}
 print('labels_index', labels_index)
 
 #tokenize the text
@@ -252,8 +253,8 @@ os.chdir('C:\\glove\\nextagenda')
 #####################################
 # Save Validation Set for Evaluation
 ####################################
-np.savetxt('y_val_3bin.txt', y_val, delimiter=',')
-np.savetxt('X_val_3bin.txt', X_val,  fmt='%s', delimiter=',')
+np.savetxt('y_val_2bin.txt', y_val, delimiter=',')
+np.savetxt('X_val_2bin.txt', X_val,  fmt='%s', delimiter=',')
 print('test and training sets saved to disk for later evaluation')
  
 
@@ -366,7 +367,7 @@ history = model.fit(X_train, y_train,
 ##############################
 # Save Model and Plots
 ##############################
-model.save('C:\\glove\\StockText_3Level3EvenClass_v1model3.h5')
+model.save('C:\\glove\\StockText_2EvenClass_model.h5')
  
 import matplotlib.pyplot as plt  
 plt.figure(1)  
