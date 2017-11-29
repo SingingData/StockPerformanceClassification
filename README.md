@@ -2,15 +2,11 @@
 # Stock Performance Classification with a 1D CNN, Keras and Azure ML Workbench
 
 ## Overview
-Based on text in public earnings releases, Next Agenda would like to predict future stock performance.  For the purposes of an initial exploration, we bucketed the future stock performance as percentage change in stock price in 4 weeks from the price on the publication date.  To simplify our exploration further, we split the performance into three equal bins – 0,1,2 – representing low performance, middle performance and high performance.  Each bin contains one third of the population.    And as a final step, to narrow the subject matter, we modeled just on data from one industry, the biotechnology industry.
+We recently worked with a financial services partner to develop a model to predict the future stock market performance of public companies in categories where they invest. The goal was to use select text narrative sections from publicly available earnings release documents to predict and alert their analytics to investment opportunities and risks. We developed a deep learning model using a one-dimensional convolutional neural network (a 1D CNN) based on text extracted from public financial statements from these companies to make these predictions. We used Azure Machine Learning Workbench to explore the data and develop the model. We modeled using the Keras deep learning Python framework with a Theano backend. The results demonstrate how a deep learning model trained on text in earnings releases and other sources could provide a valuable signal to the investment decision maker.
 
-We used a 1D CNN in Keras, using word embeddings from the GloVe vector model published by Stanford.  (all links in code).  For purposes of initial exploration, we used the smallest word vector model, with 400,000 words.  We applied 39% dropout rate, and used the RMSProp optimizer with the Xavier initializer.  We took the documented Keras approach for working with custom word embeddings.  
+This initial result suggests that that deep learning models trained on text in earnings releases and other sources could prove a viable mechanism to improve the quality of the information available to the person making the investment decision, particularly in avoiding investment losses.  While the model needs to be improved with more samples, refinements of domain-specific vocabulary and text augmentation, this model suggests that providing this signal as another decision input for investmennt analyst would improve the efficiency of the firm’s analysis work.
 
-Our output suggests there is some signal available to get above chance classification of future performance.  After 17 epochs of training, our model delivers 49.8% accuracy with a test score of 1.04.  While the sample is not enormous (943 total samples, training on 724 and testing on 219), this suggests more investigations are merited to determine if more sample, or alternative approaches can improve the signal.  
-
-As next steps, the partner will experiment with LSTM and to incorporate sequential information in the release dates.  They will aslo replicate this model for different industries and across all industries together to determine if the signal persists.   
-
-Model accuracy and loss over 15 training epochs is depicted in the illustration below.  Validation accuracy reaches a max of .49, well above the chance expected result of 33.3% for predicting classification of three evenly split bins.
+The history of model training and testing is below, trained for 24 epochs.
 ![alt text](https://github.com/SingingData/StockPerformanceClassification/blob/master/images/Model_Training_accuracyandloss.png)
  
 ## Model Architecture
