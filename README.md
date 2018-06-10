@@ -24,7 +24,7 @@ Installs and Upgrades Required (Order is Important)
 - conda install m2w64-toolchain
 - conda install -c anaconda libpython=2.0
 - pip install numpy==1.13.0
-- pip install keras #Remember to change back0end to theano in the backend folder w/in keras, init file
+- pip install keras #Remember to change back0end to theano in init file in site-packages/keras/backend/
 - pip install theano
 - pip install gensim
 - pip install nltk
@@ -33,7 +33,7 @@ Installs and Upgrades Required (Order is Important)
 - pip install --upgrade gensim
 - pip install importio
 - pip install matplotlib
-- pip install netwrokx
+- pip install networkx
 - pip install h5py
 - pip install pyparsing==1.5.7
 - pip install graphviz
